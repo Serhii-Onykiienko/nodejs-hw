@@ -4,8 +4,33 @@ import createHttpError from 'http-errors';
 //? GET
 
 export const getAllNotes = async (req, res) => {
-  const notes = await Note.find();
-  res.status(200).json(notes);
+  const { page = 1, perPage = 10, tag, search } = req.query;
+
+  const skip = (page - 1) * perPage;
+
+  const notesQuery = Note.find();
+
+  if (tag) {
+    notesQuery.where('tag').equals(tag);
+  }
+
+  if (search) {
+    notesQuery.where({
+      $or: [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+      ],
+    });
+  }
+
+  const [totalNotes, notes] = await Promise.all([
+    notesQuery.clone().countDocuments(),
+    notesQuery.skip(skip).limit(perPage),
+  ]);
+
+  const totalPages = Math.ceil(totalNotes / perPage);
+
+  res.status(200).json({ page, perPage, totalNotes, totalPages, notes });
 };
 
 //? GET by ID
@@ -33,7 +58,9 @@ export const createNote = async (req, res) => {
 
 export const deleteNote = async (req, res) => {
   const { noteId } = req.params;
+
   const note = await Note.findByIdAndDelete(noteId);
+
   if (!note) {
     throw createHttpError(404, 'Note not found');
   }
