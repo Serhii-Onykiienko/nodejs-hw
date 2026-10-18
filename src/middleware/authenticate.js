@@ -5,8 +5,8 @@ import { User } from '../models/user.js';
 export const authenticate = async (req, res, next) => {
   const { sessionId, accessToken } = req.cookies;
 
-  if (!accessToken || accessToken) {
-    throw createHttpError(401, 'Missing access token');
+  if (!sessionId || !accessToken) {
+    throw createHttpError(401, 'Missing session credentials');
   }
 
   const session = await Session.findOne({
@@ -18,9 +18,9 @@ export const authenticate = async (req, res, next) => {
     throw createHttpError(401, 'Session not found');
   }
 
-  const isValidTokenExpired = session.accessTokenValidUntil < new Date();
+  const isTokenExpired = session.accessTokenValidUntil < new Date();
 
-  if (isValidTokenExpired) {
+  if (isTokenExpired) {
     throw createHttpError(401, 'Access token expired');
   }
 
