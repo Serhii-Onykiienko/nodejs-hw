@@ -124,7 +124,7 @@ export const requestResetEmail = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw res.status(200).json({
+    return res.status(200).json({
       message: 'Password reset email sent successfully',
     });
   }
@@ -177,7 +177,7 @@ export const resetPassword = async (req, res) => {
   }
 
   const user = await User.findOne({
-    sub: payload._id,
+    _id: payload.sub,
     email: payload.email,
   });
 
@@ -189,7 +189,7 @@ export const resetPassword = async (req, res) => {
 
   await User.updateOne({ _id: user._id }, { password: hashedPassword });
 
-  // await Session.deleteMany({ userId: user._id });
+  await Session.deleteMany({ userId: user._id });
 
   res.status(200).json({ message: 'Password reset successfully' });
 };
