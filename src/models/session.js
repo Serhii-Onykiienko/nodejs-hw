@@ -18,12 +18,12 @@ const sessionSchema = new Schema(
     },
 
     accessTokenValidUntil: {
-      type: String,
+      type: Date,
       required: true,
     },
 
     refreshTokenValidUntil: {
-      type: String,
+      type: Date,
       required: true,
     },
   },

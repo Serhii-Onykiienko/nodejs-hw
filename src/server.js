@@ -10,6 +10,8 @@ import { notFoundHandler } from './middleware/notFoundHandler.js';
 import { connectMongoDB } from './db/connectMongoDB.js';
 import notesRouters from './routes/notesRoutes.js';
 import authRouters from './routes/authRoutes.js';
+import userRouters from './routes/userRoutes.js';
+
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -22,6 +24,7 @@ app.use(cookieParser());
 
 app.use(authRouters);
 app.use(notesRouters);
+app.use(userRouters);
 
 app.use(notFoundHandler);
 
